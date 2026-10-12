@@ -1,5 +1,4 @@
-﻿
-using Azure;
+﻿using Azure;
 using Azure.Data.Tables;
 
 namespace CoffeeNChill.Functions.Models;
