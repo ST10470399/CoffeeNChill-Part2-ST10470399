@@ -153,10 +153,7 @@ Docker Compose is configured to use this published image for the Functions appli
 
 ## Demonstration Video
 
-An unlisted YouTube demonstration will be linked here after recording. It should demonstrate Docker Compose startup, the published Docker Hub image, order submission, queue processing, and order status verification.
-
-**YouTube demonstration:** To be added.
-
+[https://youtu.be/axGXeKWFy2E]
 
 ## Project Status
 
