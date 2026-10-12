@@ -1,5 +1,4 @@
-﻿
-using System.Text.Json;
+﻿using System.Text.Json;
 using CoffeeNChill.Functions.Models;
 using CoffeeNChill.Functions.Services;
 using Microsoft.AspNetCore.Http;
