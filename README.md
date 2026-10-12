@@ -21,20 +21,6 @@ Part 2 extends the Part 1 application with asynchronous order processing using A
 
 ## Application Features
 
-### Part 1 — Menu Management
-
-- Create menu items.
-- Retrieve all menu items.
-- Retrieve menu items by category.
-- Update menu items.
-- Delete menu items.
-
-### Part 1 — Staff Document Management
-
-- Upload staff documents.
-- List stored staff documents.
-- Download stored documents.
-
 ### Part 2 — Asynchronous Order Processing
 
 - Accept customer orders through an HTTP POST endpoint.
@@ -171,9 +157,6 @@ An unlisted YouTube demonstration will be linked here after recording. It should
 
 **YouTube demonstration:** To be added.
 
-## Code Attribution
-
-Third-party code, documentation, libraries, and other resources must be acknowledged according to the assignment requirements. Supporting references and code attributions should be included in the relevant project documentation.
 
 ## Project Status
 
