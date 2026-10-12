@@ -1,14 +1,30 @@
 {
   "info": {
     "name": "CoffeeNChill API",
-    "description": "Covers the Menu Management endpoints (Rahul) and the Staff Documents endpoints (Emile) for the CoffeeNChill Canteen Management System Azure Functions API.",
+    "description": "CoffeeNChill Canteen Management System API: Menu Management, Staff Documents, and Asynchronous Order Processing.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:7071/api", "type": "string" },
-    { "key": "category", "value": "Beverages", "type": "string" },
-    { "key": "itemId", "value": "item-001", "type": "string" },
-    { "key": "fileName", "value": "", "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "category",
+      "value": "Beverages",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
+      "value": "item-001",
+      "type": "string"
+    },
+    {
+      "key": "fileName",
+      "value": "",
+      "type": "string"
+    }
   ],
   "item": [
     {
@@ -19,18 +35,21 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"partitionKey\": \"{{category}}\",\n  \"rowKey\": \"{{itemId}}\",\n  \"name\": \"Cappuccino\",\n  \"description\": \"Espresso with steamed milk foam\",\n  \"price\": 32.50,\n  \"isAvailable\": true\n}"
+              "raw": "{\n  \"partitionKey\": \"{{category}}\",\n  \"rowKey\": \"{{itemId}}\",\n  \"name\": \"Cappuccino\",\n  \"description\": \"Espresso with steamed milk foam\",\n  \"price\": 32.5,\n  \"isAvailable\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/menu",
               "host": ["{{baseUrl}}"],
               "path": ["menu"]
             },
-            "description": "Creates a new menu item. PartitionKey = category, RowKey = item id."
+            "description": "Creates a new menu item. PartitionKey is the category and RowKey is the item ID."
           },
           "event": [
             {
@@ -118,11 +137,14 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Cappuccino\",\n  \"description\": \"Espresso with steamed milk foam and cocoa dusting\",\n  \"price\": 35.00,\n  \"isAvailable\": true\n}"
+              "raw": "{\n  \"name\": \"Cappuccino\",\n  \"description\": \"Espresso with steamed milk foam and cocoa dusting\",\n  \"price\": 35.0,\n  \"isAvailable\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/menu/{{category}}/{{itemId}}",
@@ -141,7 +163,7 @@
                   "});",
                   "",
                   "pm.test('Price was updated', function () {",
-                  "    pm.expect(pm.response.json().price).to.eql(35.00);",
+                  "    pm.expect(pm.response.json().price).to.eql(35);",
                   "});"
                 ]
               }
@@ -198,7 +220,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["documents", "upload"]
             },
-            "description": "Streams a file to the 'staff-docs' Azure File Share. Attach a file to the 'file' form field before sending."
+            "description": "Upload a file using the file form field to the staff-docs Azure File Share."
           },
           "event": [
             {
@@ -265,7 +287,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["documents", "download", "{{fileName}}"]
             },
-            "description": "Run 'Upload Staff Document' first so {{fileName}} is populated."
+            "description": "Run Upload Staff Document first so the fileName variable is populated."
           },
           "event": [
             {
@@ -277,7 +299,7 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Content-Disposition header is present for file download', function () {",
+                  "pm.test('Content-Disposition header is present', function () {",
                   "    pm.response.to.have.header('Content-Disposition');",
                   "});"
                 ]
@@ -295,7 +317,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["documents", "download", "does-not-exist.pdf"]
             },
-            "description": "Error-handling check: requesting a file that was never uploaded should return 404."
+            "description": "Error-handling check. A file that does not exist should return 404."
           },
           "event": [
             {
@@ -310,6 +332,99 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Queue New Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-1005\",\n  \"customerName\": \"Test Customer\",\n  \"selectedItemSKUs\": [\"CAP-001\", \"LAT-001\"],\n  \"totalPrice\": 65.0,\n  \"orderTimestamp\": \"2026-10-12T12:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "queue"]
+            },
+            "description": "Submits a new order to the order-processing-queue for asynchronous processing."
+          }
+        },
+        {
+          "name": "Update Order Status - Preparing",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Preparing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/2026-10-12/ORD-1005/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "2026-10-12", "ORD-1005", "status"]
+            },
+            "description": "Run after the queued order has been processed and saved with Received status."
+          }
+        },
+        {
+          "name": "Update Order Status - Ready",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Ready\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/2026-10-12/ORD-1005/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "2026-10-12", "ORD-1005", "status"]
+            },
+            "description": "Run after the order status is Preparing."
+          }
+        },
+        {
+          "name": "Update Order Status - Collected",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Collected\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/2026-10-12/ORD-1005/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "2026-10-12", "ORD-1005", "status"]
+            },
+            "description": "Run after the order status is Ready."
+          }
         }
       ]
     }

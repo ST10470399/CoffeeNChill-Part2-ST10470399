@@ -19,6 +19,8 @@ builder.Services
     .ConfigureFunctionsApplicationInsights()
     .AddSingleton<StorageService>()
     .AddSingleton<MenuTableService>()
-    .AddSingleton<StaffDocumentService>();
+    .AddSingleton<StaffDocumentService>()
+    .AddSingleton<OrderQueueService>()
+    .AddSingleton<OrderTableService>();
 
 builder.Build().Run();

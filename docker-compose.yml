@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
 
   functions:
-    image: st10470399nehalroopnarain/coffeenchill-functions:v1.1
+    image: st10470399nehalroopnarain/coffeenchill-functions:v2.3
     container_name: coffeenchill-functions-p2
     ports:
       - "8080:80"
