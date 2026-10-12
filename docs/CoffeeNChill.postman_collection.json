@@ -1,0 +1,317 @@
+{
+  "info": {
+    "name": "CoffeeNChill API",
+    "description": "Covers the Menu Management endpoints (Rahul) and the Staff Documents endpoints (Emile) for the CoffeeNChill Canteen Management System Azure Functions API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:7071/api", "type": "string" },
+    { "key": "category", "value": "Beverages", "type": "string" },
+    { "key": "itemId", "value": "item-001", "type": "string" },
+    { "key": "fileName", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Create Menu Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partitionKey\": \"{{category}}\",\n  \"rowKey\": \"{{itemId}}\",\n  \"name\": \"Cappuccino\",\n  \"description\": \"Espresso with steamed milk foam\",\n  \"price\": 32.50,\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu"]
+            },
+            "description": "Creates a new menu item. PartitionKey = category, RowKey = item id."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains the created item', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.rowKey).to.eql(pm.collectionVariables.get('itemId'));",
+                  "    pm.expect(json.partitionKey).to.eql(pm.collectionVariables.get('category'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Menu Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Menu Items By Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/category/{{category}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "category", "{{category}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('All items belong to the requested category', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach((item) => {",
+                  "        pm.expect(item.partitionKey).to.eql(pm.collectionVariables.get('category'));",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Menu Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cappuccino\",\n  \"description\": \"Espresso with steamed milk foam and cocoa dusting\",\n  \"price\": 35.00,\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/menu/{{category}}/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "{{category}}", "{{itemId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Price was updated', function () {",
+                  "    pm.expect(pm.response.json().price).to.eql(35.00);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Menu Item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/menu/{{category}}/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["menu", "{{category}}", "{{itemId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204 No Content', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Staff Documents",
+      "item": [
+        {
+          "name": "Upload Staff Document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "upload"]
+            },
+            "description": "Streams a file to the 'staff-docs' Azure File Share. Attach a file to the 'file' form field before sending."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains uploaded file metadata', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.fileName).to.be.a('string');",
+                  "    pm.expect(json.sizeInBytes).to.be.greaterThan(-1);",
+                  "    pm.collectionVariables.set('fileName', json.fileName);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Staff Documents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array of document metadata', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    if (json.length > 0) {",
+                  "        pm.expect(json[0]).to.have.property('fileName');",
+                  "        pm.expect(json[0]).to.have.property('sizeInBytes');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Download Staff Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents/download/{{fileName}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "download", "{{fileName}}"]
+            },
+            "description": "Run 'Upload Staff Document' first so {{fileName}} is populated."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Content-Disposition header is present for file download', function () {",
+                  "    pm.response.to.have.header('Content-Disposition');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Download Staff Document - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents/download/does-not-exist.pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "download", "does-not-exist.pdf"]
+            },
+            "description": "Error-handling check: requesting a file that was never uploaded should return 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
